@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animasi Perkalian dan Pembagian</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f9ff; /* Light blue background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        h1 {
+            color: #1e40af; /* Darker blue for heading */
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .explanation {
+            font-size: 1.1rem;
+            color: #374151; /* Gray text */
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .input-group input[type="number"] {
+            padding: 10px 15px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            width: 80px;
+            text-align: center;
+            transition: all 0.2s ease-in-out;
+        }
+        .input-group input[type="number"]:focus {
+            outline: none;
+            border-color: #3b82f6; /* Blue focus border */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+        }
+        .operator-select {
+            padding: 10px 15px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            background-color: #f9fafb;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .operator-select:hover {
+            border-color: #3b82f6;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .action-buttons button {
+            background-color: #3b82f6; /* Blue button */
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+            border: none;
+        }
+        .action-buttons button:hover {
+            background-color: #2563eb; /* Darker blue on hover */
+            transform: translateY(-2px);
+        }
+        .action-buttons button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(59, 130, 246, 0.3);
+        }
+        .animation-area {
+            min-height: 200px;
+            background-color: #ecfdf5; /* Light green for animation area */
+            border-radius: 10px;
+            margin-top: 25px;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            border: 2px dashed #a7f3d0; /* Dashed border */
+            overflow: hidden; /* Ensure items don't overflow */
+            position: relative;
+        }
+        .result-area {
+            margin-top: 20px;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #065f46; /* Dark green for result */
+        }
+        .item {
+            width: 40px;
+            height: 40px;
+            background-color: #fcd34d; /* Yellow item */
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #92400e; /* Brown text on item */
+            font-weight: bold;
+            animation: popIn 0.3s ease-out forwards;
+            flex-shrink: 0; /* Prevent shrinking */
+        }
+
+        .group-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #9ca3af; /* Gray border for groups */
+            border-radius: 8px;
+            background-color: #e0f2fe; /* Lighter blue for group background */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .group-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #4b5563;
+            margin-bottom: 5px;
+        }
+
+        .group-items {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .item.removed {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                transform: scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .explanation {
+                font-size: 1rem;
+            }
+            .input-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .action-buttons button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Animasi Interaktif Perkalian & Pembagian</h1>
+        <p class="explanation">
+            Mari kita pelajari perkalian sebagai <strong>penjumlahan berulang</strong> dan pembagian sebagai <strong>pengurangan berulang</strong>.
+            Coba masukkan angka di bawah ini dan lihat animasinya!
+        </p>
+
+        <div class="input-group">
+            <label for="num1">Angka 1:</label>
+            <input type="number" id="num1" value="3" min="1" max="10">
+
+            <label for="operator">Operator:</label>
+            <select id="operator" class="operator-select">
+                <option value="multiply">x (Perkalian)</option>
+                <option value="divide">:</option>
+            </select>
+
+            <label for="num2">Angka 2:</label>
+            <input type="number" id="num2" value="4" min="1" max="10">
+        </div>
+
+        <div class="action-buttons">
+            <button id="animateButton">Mulai Animasi</button>
+            <button id="resetButton">Ulangi</button>
+        </div>
+
+        <div class="animation-area" id="animationArea">
+            <!-- Animasi objek akan muncul di sini -->
+        </div>
+
+        <div class="result-area" id="resultArea">
+            Hasil: ?
+        </div>
+    </div>
+
+    <script>
+        const num1Input = document.getElementById('num1');
+        const num2Input = document.getElementById('num2');
+        const operatorSelect = document.getElementById('operator');
+        const animateButton = document.getElementById('animateButton');
+        const resetButton = document.getElementById('resetButton');
+        const animationArea = document.getElementById('animationArea');
+        const resultArea = document.getElementById('resultArea');
+
+        // Fungsi untuk membersihkan area animasi
+        function clearAnimationArea() {
+            animationArea.innerHTML = '';
+            resultArea.textContent = 'Hasil: ?';
+        }
+
+        // Fungsi untuk membuat item visual
+        function createItem() {
+            const item = document.createElement('div');
+            item.classList.add('item');
+            return item;
+        }
+
+        // Fungsi untuk animasi perkalian
+        function animateMultiplication(num1, num2) {
+            clearAnimationArea();
+            let currentTotal = 0;
+            let step = 0;
+
+            // Tampilkan penjelasan penjumlahan berulang
+            const explanationText = document.createElement('p');
+            explanationText.classList.add('explanation');
+            explanationText.innerHTML = `<strong>${num1} x ${num2}</strong> berarti menjumlahkan <strong>${num2}</strong> sebanyak <strong>${num1}</strong> kali.`;
+            animationArea.appendChild(explanationText);
+
+            const interval = setInterval(() => {
+                if (step < num1) {
+                    const groupContainer = document.createElement('div');
+                    groupContainer.classList.add('group-container');
+                    
+                    const groupLabel = document.createElement('div');
+                    groupLabel.classList.add('group-label');
+                    groupLabel.textContent = `Kelompok ${step + 1}`;
+                    groupContainer.appendChild(groupLabel);
+
+                    const groupItems = document.createElement('div');
+                    groupItems.classList.add('group-items');
+                    groupContainer.appendChild(groupItems);
+
+                    animationArea.appendChild(groupContainer);
+
+                    for (let i = 0; i < num2; i++) {
+                        const item = createItem();
+                        item.textContent = i + 1; // Menampilkan nomor item dalam kelompok
+                        groupItems.appendChild(item);
+                    }
+                    currentTotal += num2;
+                    resultArea.textContent = `Hasil sementara: ${currentTotal}`;
+                    step++;
+                } else {
+                    clearInterval(interval);
+                    resultArea.textContent = `Hasil akhir: ${currentTotal}`;
+                }
+            }, 1000); // Setiap 1 detik tambahkan kelompok baru
+        }
+
+        // Fungsi untuk animasi pembagian
+        function animateDivision(num1, num2) {
+            clearAnimationArea();
+            let currentRemaining = num1;
+            let groupsCount = 0;
+
+            // Tampilkan penjelasan pengurangan berulang
+            const explanationText = document.createElement('p');
+            explanationText.classList.add('explanation');
+            explanationText.innerHTML = `<strong>${num1} : ${num2}</strong> berarti mengurangi <strong>${num1}</strong> dengan <strong>${num2}</strong> secara berulang sampai habis.`;
+            animationArea.appendChild(explanationText);
+
+            // Buat semua item awal
+            const initialItemsContainer = document.createElement('div');
+            initialItemsContainer.classList.add('group-container');
+            const initialLabel = document.createElement('div');
+            initialLabel.classList.add('group-label');
+            initialLabel.textContent = `Total Awal: ${num1}`;
+            initialItemsContainer.appendChild(initialLabel);
+            const initialItems = document.createElement('div');
+            initialItems.classList.add('group-items');
+            initialItemsContainer.appendChild(initialItems);
+            animationArea.appendChild(initialItemsContainer);
+
+            for (let i = 0; i < num1; i++) {
+                const item = createItem();
+                item.textContent = i + 1;
+                initialItems.appendChild(item);
+            }
+
+            const itemsArray = Array.from(initialItems.children); // Konversi ke array untuk manipulasi mudah
+
+            const interval = setInterval(() => {
+                if (currentRemaining >= num2) {
+                    // Ambil num2 item dari sisa yang ada
+                    for (let i = 0; i < num2; i++) {
+                        if (itemsArray.length > 0) {
+                            const itemToRemove = itemsArray.shift(); // Ambil item pertama
+                            itemToRemove.classList.add('removed'); // Tambahkan kelas untuk animasi fadeOut
+                            // Hapus setelah animasi selesai
+                            itemToRemove.addEventListener('animationend', () => {
+                                itemToRemove.remove();
+                            });
+                        }
+                    }
+                    currentRemaining -= num2;
+                    groupsCount++;
+                    resultArea.textContent = `Sisa: ${currentRemaining}, Kelompok terbentuk: ${groupsCount}`;
+                } else {
+                    clearInterval(interval);
+                    resultArea.textContent = `Hasil akhir: ${groupsCount} (Sisa: ${currentRemaining})`;
+                    if (currentRemaining > 0) {
+                        const remainderText = document.createElement('p');
+                        remainderText.classList.add('explanation');
+                        remainderText.textContent = `Ada sisa ${currentRemaining} yang tidak bisa dibagi rata.`;
+                        animationArea.appendChild(remainderText);
+                    }
+                }
+            }, 1500); // Setiap 1.5 detik lakukan pengurangan
+        }
+
+        // Event listener untuk tombol "Mulai Animasi"
+        animateButton.addEventListener('click', () => {
+            const num1 = parseInt(num1Input.value);
+            const num2 = parseInt(num2Input.value);
+            const operator = operatorSelect.value;
+
+            if (isNaN(num1) || isNaN(num2) || num1 < 1 || num2 < 1 || num1 > 10 || num2 > 10) {
+                resultArea.textContent = 'Mohon masukkan angka antara 1 dan 10.';
+                return;
+            }
+
+            if (operator === 'multiply') {
+                animateMultiplication(num1, num2);
+            } else if (operator === 'divide') {
+                if (num2 === 0) {
+                    resultArea.textContent = 'Tidak bisa dibagi dengan nol!';
+                    return;
+                }
+                animateDivision(num1, num2);
+            }
+        });
+
+        // Event listener untuk tombol "Ulangi"
+        resetButton.addEventListener('click', clearAnimationArea);
+
+        // Inisialisasi tampilan awal
+        clearAnimationArea();
+    </script>
+</body>
+</html>
